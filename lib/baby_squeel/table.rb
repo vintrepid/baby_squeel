@@ -109,7 +109,7 @@ module BabySqueel
     private
 
     def resolver
-      @resolver ||= Resolver.new(self, [:attribute])
+      @resolver ||= Resolver.new(self, [:subquery, :attribute])
     end
 
     def respond_to_missing?(name, *)

@@ -4,16 +4,24 @@ describe '#joining' do
   context 'joining relations' do
     it 'allows on to accept a block' do
       authors = Author.where(id: 2)
-      relation = Post.joining do
-        authors.as('a').on { a.id == author_id }
+
+      # Note: Calling `#to_sql` on this relation will return
+      # invalid SQL. If you actually run the query though,
+      # the binds end up in the right places.
+      relation = Post.joining do |post|
+        authors.as('a').on do
+          a.id == post.author_id
+        end
       end
 
-      expect(relation).to produce_sql(<<-EOSQL)
+      queries = track_queries { relation.load }
+
+      expect(queries.last).to produce_sql(<<-EOSQL)
         SELECT "posts".* FROM "posts"
         INNER JOIN (
           SELECT "authors".* FROM "authors"
-          WHERE "authors"."id" = 2
-        ) a ON a."id" = a."author_id"
+          WHERE "authors"."id" = ?
+        ) a ON a."id" = "posts"."author_id"
       EOSQL
     end
   end
