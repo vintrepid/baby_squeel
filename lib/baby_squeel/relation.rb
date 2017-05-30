@@ -9,6 +9,12 @@ module BabySqueel
       @_scope = scope
     end
 
+    def *
+      conn = _scope.connection
+      table = conn.quote_table_name(_scope.table_name)
+      Arel.sql "#{table}.*"
+    end
+
     # Constructs a new BabySqueel::Association. Raises
     # an exception if the association is not found.
     def association(name)
