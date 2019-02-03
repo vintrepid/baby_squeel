@@ -35,7 +35,8 @@ module BabySqueel
       # a list (in order of chaining) of associations and finding
       # the respective JoinAssociation at each level.
       def find_alias(associations)
-        table = find_join_association(associations).table
+        join_association = find_join_association(associations)
+        table = join_association.table || OpenStruct.new(name: join_association.base_klass.table_name)
         reconstruct_with_type_caster(table, associations)
       end
 
